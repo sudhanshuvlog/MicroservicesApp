@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+        label 'ec2'
+    }
 
     stages {
         stage('Deploy To Kubernetes') {

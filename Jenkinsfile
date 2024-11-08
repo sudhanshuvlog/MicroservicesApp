@@ -4,18 +4,22 @@ pipeline {
     }
 
     stages {
-        stage('Deploy To Kubernetes') {
+        stage('Build & Tag Docker Image') {
             steps {
-                   withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: 'EKS-1', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', serverUrl: 'https://F6458FB2C7037A1D4A228A8799DB594F.gr7.ap-south-1.eks.amazonaws.com']]) {
-                    sh "kubectl apply -f deployment-service.yml"
+                script {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker build -t shrutipp/currencyservice:latest ."
                     }
+                }
             }
         }
         
-        stage('verify Deployment') {
+        stage('Push Docker Image') {
             steps {
-               withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: 'EKS-1', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', serverUrl: 'https://F6458FB2C7037A1D4A228A8799DB594F.gr7.ap-south-1.eks.amazonaws.com']]) {
-                         sh "kubectl get svc -n webapps"
+                script {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker push shrutipp/currencyservice:latest "
+                    }
                 }
             }
         }

@@ -7,21 +7,25 @@ pipeline {
         stage('Build & Tag Docker Image') {
             steps {
                 script {
+                    withCredentials([usernamePassword(credentialsId: 'docker-cred', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                        sh "docker build -t jinny1/productcatalogservice:latest ."
-                    }
-                }
-            }
-        }
-        
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                        sh "docker push jinny1/productcatalogservice:latest "
+                        sh "docker build -t ${DOCKER_USER}/productcatalogservice:latest ."
                     }
                 }
             }
         }
     }
+        
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'docker-cred', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker push ${DOCKER_USER}/productcatalogservice:latest "
+                    }
+                }
+            }
+        }
+    }
+}
 }

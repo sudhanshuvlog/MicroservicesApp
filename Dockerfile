@@ -40,7 +40,7 @@ ENV ENABLE_PROFILER=1
 WORKDIR /email_server
 
 # Grab packages from builder
-COPY --from=builder /usr/local/lib/python3.10/ /usr/local/lib/python3.10/
+COPY --from=builder /usr/local/lib/python3.11/ /usr/local/lib/python3.11/
 
 # Add the application
 COPY . .
